@@ -1,0 +1,21 @@
+div.info-nugget {
+    flex-direction: row;
+    margin: .25rem .25rem .25rem .25rem;
+    font-size: 1.5rem;
+}
+
+div.info-title {
+    margin-right: 1rem;
+}
+
+input.info-text {
+    background-color: inherit;
+    border: none;
+    font-size: 1.5rem;
+    padding: 0;
+    text-align: center;
+}
+
+div.info-text {
+    font-size: 1.5rem;
+}

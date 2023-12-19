@@ -1,0 +1,4 @@
+div.item-editor {
+    flex-direction: row;
+    flex-grow: 1;
+}
