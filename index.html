@@ -1,106 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+    <!-- header and imports -->
     <head>
         <meta charset="UTF-8">
         <title>Dagda: Celtic Heroes World Editor</title>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+        <link rel="stylesheet" href="src/css/dropdown.css">
+        <link rel="stylesheet" href="src/css/stages.css">
         <link rel="stylesheet" href="src/css/styles.css">
         <link rel="stylesheet" href="src/css/topbar.css">
         <link rel="stylesheet" href="src/css/items.css">
         <link rel="stylesheet" href="src/css/info.css">
-
+        <link rel="stylesheet" href="src/css/side-list.css">
+        <script src="src/js/dropdown.js"></script>
         <script src="src/js/list.js"></script>
+        <script src="src/js/info-section.js"></script>
+        <script src="src/js/common-editor-elements.js"></script>
+        <script src="src/js/quest-editor.js"></script>
+        <script src="src/js/item-editor.js"></script>
+        <script src="src/js/stage-ui.js"></script>
+        <script src="src/js/topbar.js"></script>
+        <script src="src/js/utils.js"></script>
     </head>
 
     <body>
+        <!-- title and tabs -->
         <div class="topbar">
             <div class="topbar-title">
                 Dagda
             </div>
-            <div class="topbar-tabs">
-                <div class="topbar-tab">Quests</div>
-                <div class="topbar-tab">Items</div>
-                <div class="topbar-tab">Mobs</div>
-                <div class="topbar-tab">Skills</div>
+            <div id="topbar-tabs" class="topbar-tabs">
+                <div class="topbar-tab" onclick="handleTopbar('quest-editor', this)">Quests</div>
+                <div class="topbar-tab" onclick="handleTopbar('item-editor', this)">Items</div>
+                <div class="topbar-tab" onclick="handleTopbar('mob-editor', this)">Mobs</div>
+                <div class="topbar-tab" onclick="handleTopbar('skill-editor', this)">Skills</div>
             </div>
         </div>
 
-        <div class="main-content">
-            <div id="item-editor" class="item-editor">
-                <div id="items-list" class="list-container">
-                </div>
-                <div class="info-container">
-                    <div class="info-nugget">
-                        <div class="info-title">ID</div>
-                        <div class="info-text">192837</div>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Name</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Description</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Strength</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Dexterity</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Focus</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Vitality</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Attack</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Defense</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Health</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Energy</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Spell Evasion</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Physical Evasion</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Wounding Evasion</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Debuff Evasion</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                    <div class="info-nugget">
-                        <div class="info-title">Movement Evasion</div>
-                        <input type="text" class="info-text"></input>
-                    </div>
-                </div>
-            </div>
+        <!-- main content panel, each editor has its own custom panel that is shown/hidden by the selected tab -->
+        <div id="main-content" class="main-content">
+            <!-- quest editor -->
+            <div id="quest-editor" class="item-editor" style="display: none"></div>
+            <!-- item editor -->
+            <div id="item-editor" class="item-editor" style="display: none"></div>
         </div>
     </body>
 
     <script>
-        generateList("items-list", [{"id": 1, "name": "cool item"}, {"id": 123, "name": "another item"}])
+       
+        initQuestEditor()
+        initItemEditor()
     </script>
-
 </html>

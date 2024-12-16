@@ -5,38 +5,20 @@ div,body {
     color: #404040;
 }
 
-body {
-    background-color: whitesmoke;
+html {
     margin: 0;
     padding: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+}
+
+body {
+    margin: 0;
+    background-color: whitesmoke;
 }
 
 div.main-content {
     flex: 1;
 }
 
-div.list-container {
-    border: .25rem solid blue;
-    flex-direction: column;
-    justify-content: flex-start;
-    width: 20rem;
-}
-
-div.list-row {
-    flex-direction: row;
-    justify-content: space-between;
-    margin: .2rem 0 .2rem 0;
-}
-
-div.list-text {
-    align-items: center;
-    justify-content: center;
-    margin: 0 1rem 0 1rem;
-}
-
-div.info-container {
-    border: .25rem solid red;
-    flex: 1;
-}
