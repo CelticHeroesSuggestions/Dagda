@@ -8,14 +8,14 @@ import json
 # import the two connectors
 try:
     import mariadb
-    maria = True
+    using_maria = True
 except:
-    maria = False
+    using_maria = False
 try:
     import mysql.connector
-    mysql = True
+    using_mysql = True
 except:
-    mysql = False
+    using_mysql = False
 
 class Handler(SimpleHTTPRequestHandler):
     # get requests
@@ -103,7 +103,7 @@ class Database():
         mydb = None
         self.db_type = None
         print("Connecting to DB at URL", os.getenv("CH_DB_URL"), "with user", os.getenv("CH_DB_USER"), "and pass", os.getenv("CH_DB_PASS"))
-        if maria:
+        if using_maria:
             try:
                 mydb = mariadb.connect(
                     host = os.getenv("CH_DB_URL"),
