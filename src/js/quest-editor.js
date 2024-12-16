@@ -144,7 +144,7 @@ function showQuest(questId) {
     const infoContainer = document.getElementById("info-container")
     infoContainer.replaceChildren()
     quest = questData[questId]
-    infoContainer.appendChild(createInfoMainTitle(quest["quest_name"] + " (" + quest["id"] + ")"))
+    infoContainer.appendChild(createInfoMainTitle(quest["quest_name"] + " (" + quest["quest_id"] + ")"))
     infoContainer.appendChild(createInfoNugget('Name', () => { saveQuestToDb(questId) }, true, quest["quest_name"], true))
     infoContainer.appendChild(createInfoNugget('Description', () => { saveQuestToDb(questId) }, true, quest["description"], true))
 

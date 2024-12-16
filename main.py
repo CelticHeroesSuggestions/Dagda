@@ -47,7 +47,7 @@ class Handler(SimpleHTTPRequestHandler):
             # Parse the JSON data from the body
             try:
                 data = json.loads(post_data)
-                response_message = f"Received data: {data["action"]}, {data["target"]}"
+                response_message = f"Received data: {data['action']}, {data['target']}"
                 print(response_message)
 
                 # "get" will pull a "target" table from the database
@@ -126,36 +126,55 @@ class Database():
         if mydb is None:
             print("Neither connection was able to connect to the database! Check that you have installed a connector that matches the target database, and that your environment variables are set.")
             sys.exit(1)
-        self.db = mydb.cursor()
+        self.db = mydb
         return
 
     # get all table contents from the database
     def get_table(self, table):
+        cursor = self.db.cursor()
         if "." not in table:
             table = "ch_unitydatadb." + table
-        try:
-            self.db.execute(f"SELECT * FROM {table}")
-            return self.db.fetchall()
-        except mariadb.OperationalError:
-            print("Database table", table, "does not exist!!")
+        if self.db_type == "mariadb":
+            try:
+                cursor.execute(f"SELECT * FROM {table}")
+                res = cursor.fetchall()
+                cursor.close()
+                return res
+            except mariadb.OperationalError:
+                print("Database table", table, "does not exist!!")
+        elif self.db_type == "mysql":
+            try:
+                cursor.execute(f"SELECT * FROM {table}")
+                res = cursor.fetchall()
+                cursor.close()
+                return res
+            except mysql.connector.errors.ProgrammingError:
+                print("Database table", table, "does not exist!!")
         return []
     
     # execute a query on the database
     def execute(self, query):
+        cursor = self.db.cursor()
         query = query.replace(", ,", ", NULL,").replace(", None,", ", NULL,")
         print("* Query *")
         print(query)
         if self.db_type == "mariadb":
             try:
-                self.db.execute(query)
+                cursor.execute(query)
+                self.db.commit()
+                cursor.close()
                 print("* Success *")
             except mariadb.OperationalError:
+                cursor.close()
                 print("*Invalid query*", query)
         elif self.db_type == "mysql":
             try:
-                self.db.execute(query)
+                cursor.execute(query)
+                self.db.commit()
+                cursor.close()
                 print("* Success *")
             except mysql.connector.errors.ProgrammingError:
+                cursor.close()
                 print("*Invalid query*", query)
         return
     
@@ -180,6 +199,17 @@ print("Connected to database!")
 httpd = HTTPServer((host, port), Handler)
 print(f'Serving HTTP on {host}:{port}')
 print(f'Looking for static assets in {os.getcwd()}')
+
+# query1 = "DELETE FROM ch_unitydatadb.quest_templates WHERE quest_id = 1;"
+# query2 = "INSERT INTO ch_unitydatadb.quest_templates (quest_id, level_required, xp_reward, coins_reward, item_reward, item_count, prerequesit, zone, quest_level, repeatable, requires_class, has_ability, lacks_ability, uses_loot_table, blocked_by, quest_name, bounty_weight, quest_type, faction_id, faction_level, faction_id_reward, faction_point_reward, description) VALUES (1, 1, 150, 5, NULL, 0, NULL, 2, 1, 0, 0, -1, -1, 0, NULL, 'Starting Out', 0, 0, 0, 0, 0, 0, 'You have arrived in Lirs Reach to find it under attack from Direhounds - it looks like your chance for adventure will come sooner than you thought!');"
+
+# cursor = db.db.cursor()
+# cursor.execute(query1)
+# cursor.execute(query2)
+# db.db.commit()
+# cursor.close()
+# print("EXECUTED QUERY")
+
 try:
     httpd.serve_forever()
 except KeyboardInterrupt:
