@@ -4,7 +4,18 @@ from urllib.parse import urlparse
 from http.server import SimpleHTTPRequestHandler
 from http.server import HTTPServer
 import json
-import mariadb
+
+# import the two connectors
+try:
+    import mariadb
+    maria = True
+except:
+    maria = False
+try:
+    import mysql.connector
+    mysql = True
+except:
+    mysql = False
 
 class Handler(SimpleHTTPRequestHandler):
     # get requests
@@ -89,12 +100,32 @@ class Database():
 
     # connect to the database
     def init_db(self):
-        print(">>>", os.getenv("CH_DB_URL"), os.getenv("CH_DB_USER"), os.getenv("CH_DB_PASS"))
-        mydb = mariadb.connect(
-            host = os.getenv("CH_DB_URL"),
-            user = os.getenv("CH_DB_USER"),
-            password = os.getenv("CH_DB_PASS")
-        )
+        mydb = None
+        self.db_type = None
+        print("Connecting to DB at URL", os.getenv("CH_DB_URL"), "with user", os.getenv("CH_DB_USER"), "and pass", os.getenv("CH_DB_PASS"))
+        if maria:
+            try:
+                mydb = mariadb.connect(
+                    host = os.getenv("CH_DB_URL"),
+                    user = os.getenv("CH_DB_USER"),
+                    password = os.getenv("CH_DB_PASS")
+                )
+                self.db_type = "mariadb"
+            except Exception as e:
+                print("MariaDB connector is installed, but unable to connect:", e)
+        if mydb is None:
+            try:
+                mydb = mysql.connector.connect(
+                    host = os.getenv("CH_DB_URL"),
+                    user = os.getenv("CH_DB_USER"),
+                    password = os.getenv("CH_DB_PASS")
+                )
+                self.db_type = "mysql"
+            except Exception as e:
+                print("MySQL connector is installed, but unable to connect:", e)
+        if mydb is None:
+            print("Neither connection was able to connect to the database! Check that you have installed a connector that matches the target database, and that your environment variables are set.")
+            sys.exit(1)
         self.db = mydb.cursor()
         return
 
@@ -114,11 +145,18 @@ class Database():
         query = query.replace(", ,", ", NULL,").replace(", None,", ", NULL,")
         print("* Query *")
         print(query)
-        try:
-            self.db.execute(query)
-            print("* Success *")
-        except mariadb.OperationalError:
-            print("Invalid query:", query)
+        if self.db_type == "mariadb":
+            try:
+                self.db.execute(query)
+                print("* Success *")
+            except mariadb.OperationalError:
+                print("*Invalid query*", query)
+        elif self.db_type == "mysql":
+            try:
+                self.db.execute(query)
+                print("* Success *")
+            except mysql.connector.errors.ProgrammingError:
+                print("*Invalid query*", query)
         return
     
 
