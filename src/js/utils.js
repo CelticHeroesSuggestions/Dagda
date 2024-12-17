@@ -27,5 +27,5 @@ function removeRowsAfterN(container, n) {
 
 // get value by ID
 function getValueById(values, id) {
-    return values.find(value => value[0] == id)
+    return values.find(value => value["id"] == id)
 }

@@ -53,7 +53,7 @@ function createSearchableDropdown(container, values, callback) {
     
     // dropdown list items
     values.forEach((item) => {
-        let itemString = item[1] + " (" + item[0] + ")"
+        let itemString = item["name"] + " (" + item["id"] + ")"
         const dropdownItem = document.createElement('div')
         dropdownItem.className = 'dropdown-item'
         dropdownItem.innerHTML = itemString

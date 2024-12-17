@@ -7,8 +7,6 @@ const completionTypes = [[0, "Kill"], [1, "Loot/Gather Item"], [2, "Go to Locati
 
 const itemData = [[0, "Royal hat"], [1, "Dry bones"], [2, "Golden apple"], [3, "Magic wand"], [4, "Ancient scroll"], [5, "Mystic orb"], [6, "Silver key"], [7, "Crystal shard"], [8, "Emerald ring"], [9, "Dragon scale"]]
 
-const mobData = [[0, "Goblin"], [1, "Orc"], [2, "Troll"], [3, "Giant"], [4, "Dragon"], [5, "Wyvern"], [6, "Basilisk"], [7, "Cyclops"], [8, "Minotaur"], [70000, "Gargoyle"]]
-
 const skillData = [[54, "Light Heal"], [1, "Fireball"], [2, "Ice Shard"], [3, "Lightning Bolt"], [4, "Earthquake"], [5, "Wind Slash"], [6, "Water Blast"], [7, "Darkness"], [8, "Holy Light"], [9, "Shadow Strike"]]
 
 function initQuestEditor() {
@@ -70,7 +68,6 @@ function createAddRemoveStageButtons(questId, container) {
         // save the stages to the DB
         saveQuestToDb(questId)
     }
-    console.log(container)
 
     // create the remove stage button
     const removeStageButton = document.createElement('div')
@@ -198,7 +195,7 @@ function showQuest(questId) {
 
 // get the quest data from the database
 function fetchQuestData() {
-    document.getElementById('quests-list-reload').innerHTML = '...'
+    document.getElementById('quests-list-reload').innerHTML = 'Quests...'
     getData({"action": "get", "target": "quest_templates"}, receiveQuestTemplateData)
 }
 
@@ -258,9 +255,6 @@ function receiveQuestStageTemplateData(data) {
         })
     })
 
-    // update the search button text
-    document.getElementById('quests-list-reload').innerHTML = searchButtonTexts["quests"]
-
     // update the search results
     numResults = generateList("quests-list-container", dataSummaries["quests"], showQuest, document.getElementById("quests-list-search-input").value)
 
@@ -269,4 +263,7 @@ function receiveQuestStageTemplateData(data) {
         showQuest(dataSummaries["quests"][0].id)
         highlightListRow("quests", 0)
     }
+
+    // now that we have the quest stage data, get the mob data
+    fetchMobData()
 }

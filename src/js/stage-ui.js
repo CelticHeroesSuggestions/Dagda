@@ -4,17 +4,16 @@
 function updateCompletionDetailsField(questId, stageId, parentElement) {
     let stage = questData[questId]["stages"].find(stage => stage["stage_id"] == stageId)
     // remove the rows after the first two
-    console.log("Parent element:", parentElement)
     removeRowsAfterN(parentElement, 1)
     createStageRowBottom(stage, parentElement)
     let stageCompletionDetailsDiv = document.getElementById('stage-completion-details-' + stageId)
     
     // kill a mob
     if (stage["completion_type"] == 0) {
-        stagePrefillKeyQuantityRows(stage, parentElement, mobData)
+        stagePrefillKeyQuantityRows(stage, parentElement, dataSummaries["mobs"])
         // add a new row if it's not already there
         if (parentElement.children.length == 2) {
-            createNewRowWithDropdownAndQuantity(parentElement, mobData, () => {
+            createNewRowWithDropdownAndQuantity(parentElement, dataSummaries["mobs"], () => {
                 compileBasicKeyValueSet(questId, stageId, parentElement)
             })
         }
@@ -88,7 +87,7 @@ function stagePrefillKeyQuantityRows(stage, container, values) {
         let id = parseInt(keyQuantity[0])
         let value = getValueById(values, id)
         container.lastChild.value = value
-        container.lastChild.children[0].children[0].children[0].innerHTML = value ? value[1] + " (" + value[0] + ")" : "UNKNOWN (" + id + ")"
+        container.lastChild.children[0].children[0].children[0].innerHTML = value ? value["name"] + " (" + value["id"] + ")" : "UNKNOWN (" + id + ")"
         container.lastChild.children[0].children[1].value = keyQuantity[1]
     }
 }
@@ -141,8 +140,6 @@ function createStageRowBottom(stage, stageContainer) {
     stageCompletionType.className = 'stages-stage-text'
     stageCompletionType.innerHTML = 'Task:&emsp;'
     stageRowBottom.appendChild(stageCompletionType)
-
-    console.log("Stage row bottom parent", stageRowBottom.parentElement)
 
     // stage completion type dropdown
     const stageCompletionTypeDropdown = createDropdown('stage-completion-type-' + stage["stage_id"], completionTypes, completionTypes[stage["completion_type"]], (data) => {
