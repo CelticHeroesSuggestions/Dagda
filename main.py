@@ -65,15 +65,15 @@ class Handler(SimpleHTTPRequestHandler):
                         # replace the stages
                         print(data["data"])
                         for stage in data["data"]["stages"]:
-                            query = f"DELETE FROM ch_unitydatadb.quest_stage_templates WHERE quest_id = {stage["quest_id"]};"
-                            db.execute(query)
-                            query = f"INSERT INTO ch_unitydatadb.quest_stage_templates (quest_id, stage_id, completion_type, completion_details, next_stage, stage_open_sum, description) VALUES ({stage["quest_id"]}, {stage["stage_id"]}, {stage["completion_type"]}, {stage["completion_details"]}, {stage["next_stage"]}, {stage["stage_open_sum"]}, \"{stage["description"]}\");"
-                            db.execute(query)
+                            queries = []
+                            queries.append(f"DELETE FROM ch_unitydatadb.quest_stage_templates WHERE quest_id = {stage["quest_id"]};")
+                            queries.append(["INSERT INTO ch_unitydatadb.quest_stage_templates (quest_id, stage_id, completion_type, completion_details, next_stage, stage_open_sum, description) VALUES (%s, %s, %s, %s, %s, %s, %s)", (stage["quest_id"], stage["stage_id"], stage["completion_type"], stage["completion_details"], stage["next_stage"], stage["stage_open_sum"], stage["description"])])
+                            db.execute(queries)
                         # replace the quest
-                        query = f"DELETE FROM ch_unitydatadb.quest_templates WHERE quest_id = {data["data"]["quest_id"]};"
-                        db.execute(query)
-                        query = f"INSERT INTO ch_unitydatadb.quest_templates (quest_id, level_required, xp_reward, coins_reward, item_reward, item_count, prerequesit, zone, quest_level, repeatable, requires_class, has_ability, lacks_ability, uses_loot_table, blocked_by, quest_name, bounty_weight, quest_type, faction_id, faction_level, faction_id_reward, faction_point_reward, description) VALUES ({data["data"]["quest_id"]}, {data["data"]["level_required"]}, {data["data"]["xp_reward"]}, {data["data"]["coins_reward"]}, {data["data"]["item_reward"]}, {data["data"]["item_count"]}, {data["data"]["prerequesit"]}, {data["data"]["zone"]}, {data["data"]["quest_level"]}, {data["data"]["repeatable"]}, {data["data"]["requires class"]}, {data["data"]["has_ability"]}, {data["data"]["lacks_ability"]}, {data["data"]["uses_loot_table"]}, {data["data"]["blocked_by"]}, \"{data["data"]["quest_name"]}\", {data["data"]["bounty_weight"]}, {data["data"]["quest_type"]}, {data["data"]["faction_id"]}, {data["data"]["faction_level"]}, {data["data"]["faction_id_reward"]}, {data["data"]["faction_point_reward"]}, \"{data["data"]["description"]}\");"
-                        db.execute(query)
+                        queries = []
+                        queries.append(f"DELETE FROM ch_unitydatadb.quest_templates WHERE quest_id = {data["data"]["quest_id"]};")
+                        queries.append(["INSERT INTO ch_unitydatadb.quest_templates (quest_id, level_required, xp_reward, coins_reward, item_reward, item_count, prerequesit, zone, quest_level, repeatable, requires_class, has_ability, lacks_ability, uses_loot_table, blocked_by, quest_name, bounty_weight, quest_type, faction_id, faction_level, faction_id_reward, faction_point_reward, description) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (data["data"]["quest_id"], data["data"]["level_required"], data["data"]["xp_reward"], data["data"]["coins_reward"], data["data"]["item_reward"], data["data"]["item_count"], data["data"]["prerequesit"], data["data"]["zone"], data["data"]["quest_level"], data["data"]["repeatable"], data["data"]["requires class"], data["data"]["has_ability"], data["data"]["lacks_ability"], data["data"]["uses_loot_table"], data["data"]["blocked_by"], data["data"]["quest_name"], data["data"]["bounty_weight"], data["data"]["quest_type"], data["data"]["faction_id"], data["data"]["faction_level"], data["data"]["faction_id_reward"], data["data"]["faction_point_reward"], data["data"]["description"])])
+                        db.execute(queries)
                 # Send a success response
                 self.send_response(200)
                 self.send_header("Content-type", "application/json")
@@ -152,15 +152,37 @@ class Database():
                 print("Database table", table, "does not exist!!")
         return []
     
+    # sanitize inputs
+    def sanitize(self, inputs):
+        if isinstance(inputs, str):
+            inputs.replace(", ,", ", NULL,").replace(", None,", ", NULL,")
+        elif isinstance(inputs, list):
+            for i in range(len(inputs)):
+                if inputs[i] is None or inputs[i] == "" or inputs[i] == "None":
+                    inputs[i] = "NULL"
+        return inputs
+    
+    # print a query that has values
+    def print_query_with_values(self, query):
+        print(query[0][:query[0].find("(%s")] + str(query[1]))
+
     # execute a query on the database
-    def execute(self, query):
+    def execute(self, queries):
+        # force queries to be a list
+        if isinstance(queries, str):
+            queries = [queries]
         cursor = self.db.cursor()
-        query = query.replace(", ,", ", NULL,").replace(", None,", ", NULL,")
         print("* Query *")
-        print(query)
         if self.db_type == "mariadb":
             try:
-                cursor.execute(query)
+                for query in queries:
+                    # if a list, execute with parameters
+                    if isinstance(query, list):
+                        self.print_query_with_values(query)
+                        cursor.execute(self.sanitize(query[0]), self.sanitize(query[1]))
+                    else:
+                        print(query)
+                        cursor.execute(self.sanitize(query))
                 self.db.commit()
                 cursor.close()
                 print("* Success *")
@@ -169,7 +191,14 @@ class Database():
                 print("*Invalid query*", query)
         elif self.db_type == "mysql":
             try:
-                cursor.execute(query)
+                for query in queries:
+                    # if a list, execute with parameters
+                    if isinstance(query, list):
+                        self.print_query_with_values(query[0])
+                        cursor.execute(self.sanitize(query[0]), self.sanitize(query[1]))
+                    else:
+                        print(query)
+                        cursor.execute(self.sanitize(query))
                 self.db.commit()
                 cursor.close()
                 print("* Success *")
