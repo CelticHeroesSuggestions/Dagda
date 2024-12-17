@@ -20,10 +20,10 @@ function updateCompletionDetailsField(questId, stageId, parentElement) {
     }
     // loot/gather an item
     else if (stage["completion_type"] == 1) {
-        stagePrefillKeyQuantityRows(stage, parentElement, itemData)
+        stagePrefillKeyQuantityRows(stage, parentElement, dataSummaries["items"])
         // add a new row if it's not already there
         if (parentElement.children.length == 2) {
-            createNewRowWithDropdownAndQuantity(parentElement, itemData, () => {
+            createNewRowWithDropdownAndQuantity(parentElement, dataSummaries["items"], () => {
                 compileBasicKeyValueSet(questId, stageId, parentElement)
             })
         }
@@ -37,27 +37,27 @@ function updateCompletionDetailsField(questId, stageId, parentElement) {
     }
     // hand in item (single)
     else if (stage["completion_type"] == 6) {
-        stagePrefillKeyQuantityRows(stage, parentElement, itemData)
+        stagePrefillKeyQuantityRows(stage, parentElement, dataSummaries["items"])
         // add a new row if it's not already there
         if (parentElement.children.length == 2) {
-            createNewRowWithDropdownAndQuantity(parentElement, itemData, () => {
+            createNewRowWithDropdownAndQuantity(parentElement, dataSummaries["items"], () => {
                 compileBasicKeyValueSet(questId, stageId, parentElement)
             })
         }
     }
     // hand in item (multiple)
     else if (stage["completion_type"] == 7) {
-        stagePrefillKeyQuantityRows(stage, parentElement, itemData)
+        stagePrefillKeyQuantityRows(stage, parentElement, dataSummaries["items"])
         // add new rows if it's not already there
         if (parentElement.children.length == 2) {
-            createNewRowWithDropdownAndQuantity(parentElement, itemData, () => {
+            createNewRowWithDropdownAndQuantity(parentElement, dataSummaries["items"], () => {
                 compileBasicKeyValueSet(questId, stageId, parentElement)
             })
-            createNewRowWithDropdownAndQuantity(parentElement, itemData, () => {
+            createNewRowWithDropdownAndQuantity(parentElement, dataSummaries["items"], () => {
                 compileBasicKeyValueSet(questId, stageId, parentElement)
             })
         }
-        addRowWithButtonForNewRowWithDropdownAndQuantity(parentElement, itemData, () => {
+        addRowWithButtonForNewRowWithDropdownAndQuantity(parentElement, dataSummaries["items"], () => {
             compileBasicKeyValueSet(questId, stageId, parentElement)
         })
     }
@@ -202,7 +202,7 @@ function compileBasicKeyValueSet(questId, stageId, container) {
     let results = ""
     for (let i = 2; i < container.children.length; i++) {
         let row = container.children[i]
-        let key = row.value?.[0];
+        let key = row.value?.["id"];
         let value = row.children[0]?.children[1]?.value
         if (key && value) {
             results += key + "," + value + ";"
@@ -212,6 +212,8 @@ function compileBasicKeyValueSet(questId, stageId, container) {
     if (results[results.length - 1] == ";") {
         results = results.slice(0, -1)
     }
+    // save the new quest data
+    questData[questId]["stages"].find(stage => stage["stage_id"] == stageId)["completion_details"] = results
     // save the results to the database
     saveQuestToDb(questId)
 }

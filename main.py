@@ -52,7 +52,7 @@ class Handler(SimpleHTTPRequestHandler):
 
                 # "get" will pull a "target" table from the database
                 if data["action"] == "get":
-                    response_message = db.get_table(data["target"])
+                    response_message = db.get_table(data["target"], fields=data["fields"] if "fields" in data else [])
                     for row in range(len(response_message)):
                         for col in range(len(response_message[row])):
                             if type(response_message[row][col]) == bytes:
@@ -63,14 +63,11 @@ class Handler(SimpleHTTPRequestHandler):
                     # update a quest's stage template and stages individually
                     if data["target"] == "quest":
                         # replace the stages
-                        print(data["data"])
-                        for stage in data["data"]["stages"]:
-                            queries = []
-                            queries.append(f"DELETE FROM ch_unitydatadb.quest_stage_templates WHERE quest_id = {stage["quest_id"]};")
-                            queries.append(["INSERT INTO ch_unitydatadb.quest_stage_templates (quest_id, stage_id, completion_type, completion_details, next_stage, stage_open_sum, description) VALUES (%s, %s, %s, %s, %s, %s, %s)", (stage["quest_id"], stage["stage_id"], stage["completion_type"], stage["completion_details"], stage["next_stage"], stage["stage_open_sum"], stage["description"])])
-                            db.execute(queries)
-                        # replace the quest
                         queries = []
+                        queries.append(f"DELETE FROM ch_unitydatadb.quest_stage_templates WHERE quest_id = {data["data"]["quest_id"]};")
+                        for stage in data["data"]["stages"]:
+                            queries.append(["INSERT INTO ch_unitydatadb.quest_stage_templates (quest_id, stage_id, completion_type, completion_details, next_stage, stage_open_sum, description) VALUES (%s, %s, %s, %s, %s, %s, %s)", (stage["quest_id"], stage["stage_id"], stage["completion_type"], stage["completion_details"], stage["next_stage"], stage["stage_open_sum"], stage["description"])])
+                        # replace the quest
                         queries.append(f"DELETE FROM ch_unitydatadb.quest_templates WHERE quest_id = {data["data"]["quest_id"]};")
                         queries.append(["INSERT INTO ch_unitydatadb.quest_templates (quest_id, level_required, xp_reward, coins_reward, item_reward, item_count, prerequesit, zone, quest_level, repeatable, requires_class, has_ability, lacks_ability, uses_loot_table, blocked_by, quest_name, bounty_weight, quest_type, faction_id, faction_level, faction_id_reward, faction_point_reward, description) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (data["data"]["quest_id"], data["data"]["level_required"], data["data"]["xp_reward"], data["data"]["coins_reward"], data["data"]["item_reward"], data["data"]["item_count"], data["data"]["prerequesit"], data["data"]["zone"], data["data"]["quest_level"], data["data"]["repeatable"], data["data"]["requires class"], data["data"]["has_ability"], data["data"]["lacks_ability"], data["data"]["uses_loot_table"], data["data"]["blocked_by"], data["data"]["quest_name"], data["data"]["bounty_weight"], data["data"]["quest_type"], data["data"]["faction_id"], data["data"]["faction_level"], data["data"]["faction_id_reward"], data["data"]["faction_point_reward"], data["data"]["description"])])
                         db.execute(queries)
@@ -130,13 +127,13 @@ class Database():
         return
 
     # get all table contents from the database
-    def get_table(self, table):
+    def get_table(self, table, fields=[]):
         cursor = self.db.cursor()
         if "." not in table:
             table = "ch_unitydatadb." + table
         if self.db_type == "mariadb":
             try:
-                cursor.execute(f"SELECT * FROM {table}")
+                cursor.execute(f"SELECT {("*" if fields == [] else ", ".join(fields))} FROM {table}")
                 res = cursor.fetchall()
                 cursor.close()
                 return res

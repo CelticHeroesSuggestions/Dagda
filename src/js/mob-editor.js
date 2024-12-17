@@ -61,7 +61,19 @@ function receiveMobTemplateData(data) {
         }
         dataSummaries["mobs"].push({"id": mobId, "name": mobName})
     })
+}
 
-    // update the search button text
-    document.getElementById('quests-list-reload').innerHTML = searchButtonTexts["quests"]
+function fetchMobSummaryData() {
+    document.getElementById('quests-list-reload').innerHTML = 'Mobs...'
+    getData({"action": "get", "target": "mob_templates", "fields": ["mob_template_id", "mob_name"]}, receiveMobSummaryData)
+}
+
+function receiveMobSummaryData(data) {
+    // parse the item data
+    dataSummaries["mobs"] = []
+    data["message"].forEach(row => {
+        dataSummaries["mobs"].push({"id": row[0], "name": row[1]})
+    })
+
+    fetchItemSummaryData()
 }

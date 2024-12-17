@@ -15,7 +15,7 @@ function getData(data, callback) {
 }
 
 function saveQuestToDb(questId) {
-    getData({"action": "set", "target": "quest", "data": questData[questId]})
+    getData({"action": "set", "target": "quest", "data": questData[questId]}, () => {})
 }
 
 // remove all rows after row N

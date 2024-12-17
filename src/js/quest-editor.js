@@ -5,8 +5,6 @@ var questsListSearchInput = undefined  // search input element
 
 const completionTypes = [[0, "Kill"], [1, "Loot/Gather Item"], [2, "Go to Location"], [3, "Talk to Mentioned NPC"], [4, "End Quest"], [5, "Completed Quest"], [6, "Give Item"], [7, "Give Multiple Items"], [8, "Cast Skill"], [9, "Give Gold"], [10, "Cast Skill On"], [11, "Kill Mob in List"], [12, "Kill Mob in Set"], [13, "Gather Node"], [14, "Gather Node of Set"], [15, "Equip Item"], [16, "Use Item"]]
 
-const itemData = [[0, "Royal hat"], [1, "Dry bones"], [2, "Golden apple"], [3, "Magic wand"], [4, "Ancient scroll"], [5, "Mystic orb"], [6, "Silver key"], [7, "Crystal shard"], [8, "Emerald ring"], [9, "Dragon scale"]]
-
 const skillData = [[54, "Light Heal"], [1, "Fireball"], [2, "Ice Shard"], [3, "Lightning Bolt"], [4, "Earthquake"], [5, "Wind Slash"], [6, "Water Blast"], [7, "Darkness"], [8, "Holy Light"], [9, "Shadow Strike"]]
 
 function initQuestEditor() {
@@ -236,8 +234,16 @@ function receiveQuestTemplateData(data) {
     })
 
     // now that we have the quests, let's get the stages
+    fetchQuestStageData()
+
+}
+
+// get the quest stage data from the database
+function fetchQuestStageData() {
+    document.getElementById('quests-list-reload').innerHTML = 'Stages...'
     getData({"action": "get", "target": "quest_stage_templates"}, receiveQuestStageTemplateData)
 }
+
 
 function receiveQuestStageTemplateData(data) {
     // parse the quest stage data
@@ -264,6 +270,6 @@ function receiveQuestStageTemplateData(data) {
         highlightListRow("quests", 0)
     }
 
-    // now that we have the quest stage data, get the mob data
-    fetchMobData()
+    // get the mob data
+    fetchMobSummaryData()
 }
