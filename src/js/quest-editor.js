@@ -14,7 +14,7 @@ function initQuestEditor() {
     const questEditor = document.getElementById("quest-editor")
     
     // set up the list and search
-    setUpListSection("quests", questEditor, fetchQuestData)
+    setUpListSection("quests", questEditor, fetchQuestData, showQuest)
     
     // set up the main info section
     setUpInfoSection("quest", questEditor)
