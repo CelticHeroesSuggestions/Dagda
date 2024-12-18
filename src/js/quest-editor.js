@@ -3,7 +3,7 @@ var questData = {}
 var questDataFetchInterval // interval object for fetching quest data
 var questsListSearchInput = undefined  // search input element
 
-const completionTypes = [[0, "Kill"], [1, "Loot/Gather Item"], [2, "Go to Location"], [3, "Talk to Mentioned NPC"], [4, "End Quest"], [5, "Completed Quest"], [6, "Give Item"], [7, "Give Multiple Items"], [8, "Cast Skill"], [9, "Give Gold"], [10, "Cast Skill On"], [11, "Kill Mob in List"], [12, "Kill Mob in Set"], [13, "Gather Node"], [14, "Gather Node of Set"], [15, "Equip Item"], [16, "Use Item"]]
+const completionTypes = [[0, "Kill"], [1, "Loot/Gather Item"], [2, "Go to Location"], [3, "Talk to Mentioned NPC"], [4, "End Quest"], [5, "Completed Quest"], [6, "Hand in Item"], [7, "Hand in Multiple Items"], [8, "Cast Skill"], [9, "Give Gold"], [10, "Cast Skill On"], [11, "Kill Mob in List"], [12, "Kill Mob in Set"], [13, "Gather Node"], [14, "Gather Node of Set"], [15, "Equip Item"], [16, "Use Item"]]
 
 const skillData = [[54, "Light Heal"], [1, "Fireball"], [2, "Ice Shard"], [3, "Lightning Bolt"], [4, "Earthquake"], [5, "Wind Slash"], [6, "Water Blast"], [7, "Darkness"], [8, "Holy Light"], [9, "Shadow Strike"]]
 
