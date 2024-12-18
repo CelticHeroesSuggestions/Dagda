@@ -37,9 +37,18 @@ function showQuestStages(questId) {
     let stagesContainer = document.getElementById('stages-container')
     stagesContainer.replaceChildren()
     quest = questData[questId]
+    let i = 0
     quest["stages"].forEach(stage => {
+        // while here, ensure the next stage is lined up correctly
+        if (i < quest["stages"].length - 1) {
+            questData[questId]["stages"][i]["next_stage"] = questData[questId]["stages"][i+1]["stage_id"]
+        }
+        else if (i == quest["stages"].length - 1) {
+            questData[questId]["stages"][i]["next_stage"] = -1
+        }
+        i += 1
+        // add the stage
         let stageContainer = addStage(stage, stagesContainer)
-
         // populate the completion details field
         updateCompletionDetailsField(questId, stage["stage_id"], stageContainer)
     })
@@ -59,6 +68,24 @@ function createAddRemoveStageButtons(questId, container) {
         let newStage = {"quest_id": questId, "stage_id": numStages-1, "description": "Enter description here", "completion_type": 0, "completion_details": "", "next_stage": numStages, "stage_open_sum": 1}
         // add in the stage to the quest data
         questData[questId]["stages"].splice(numStages-1, 0, newStage)
+        // set the stage id of the last stage (+1)
+        questData[questId]["stages"][numStages]["stage_id"] = numStages
+        // reload the stages
+        showQuestStages(questId)
+        // save the stages to the DB
+        saveQuestToDb(questId)
+    }
+
+    // create the add end button
+    const addEndButton = document.createElement('div')
+    addEndButton.className = 'stages-stage-button-half-width'
+    addEndButton.style.backgroundColor = "skyblue"
+    addEndButton.innerHTML = 'Add End'
+    addEndButton.onclick = () => {
+        let numStages = container.children.length - 1
+        let newStage = {"quest_id": questId, "stage_id": numStages, "description": "", "completion_type": 4, "completion_details": "", "next_stage": -1, "stage_open_sum": 0}
+        // add in the stage to the quest data
+        questData[questId]["stages"].push(newStage)
         // set the stage id of the last stage (+1)
         questData[questId]["stages"][numStages]["stage_id"] = numStages
         // reload the stages
@@ -90,6 +117,7 @@ function createAddRemoveStageButtons(questId, container) {
     buttonContainer.style.alignSelf = "stretch"
     buttonContainer.style.marginTop = '1rem'
     buttonContainer.appendChild(addStageButton)
+    buttonContainer.appendChild(addEndButton)
     buttonContainer.appendChild(removeStageButton)
     container.appendChild(buttonContainer)
 }
