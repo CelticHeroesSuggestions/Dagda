@@ -38,20 +38,38 @@ function showQuestStages(questId) {
     stagesContainer.replaceChildren()
     quest = questData[questId]
     let i = 0
+    let anyChangedStageNextIndex = false
     quest["stages"].forEach(stage => {
         // while here, ensure the next stage is lined up correctly
+        let changedStageNextIndex = false
         if (i < quest["stages"].length - 1) {
-            questData[questId]["stages"][i]["next_stage"] = questData[questId]["stages"][i+1]["stage_id"]
+            if (questData[questId]["stages"][i]["next_stage"] != questData[questId]["stages"][i+1]["stage_id"]) {
+                questData[questId]["stages"][i]["next_stage"] = questData[questId]["stages"][i+1]["stage_id"]
+                changedStageNextIndex = true
+            }
         }
         else if (i == quest["stages"].length - 1) {
-            questData[questId]["stages"][i]["next_stage"] = -1
+            if (questData[questId]["stages"][i]["next_stage"] != -1) {
+                questData[questId]["stages"][i]["next_stage"] = -1
+                changedStageNextIndex = true
+            }
         }
         i += 1
         // add the stage
         let stageContainer = addStage(stage, stagesContainer)
+        // if changed the stage, highlight the container
+        if (changedStageNextIndex) {
+            stageContainer.style.backgroundColor = "lightcoral"
+            anyChangedStageNextIndex = true
+        }
         // populate the completion details field
         updateCompletionDetailsField(questId, stage["stage_id"], stageContainer)
     })
+
+    if (anyChangedStageNextIndex) {
+        saveQuestToDb(questId)
+        alert("At least one stage in this quest (" + questId + ") has a next stage that is out of order, so the order has been corrected and saved. The corrected stages are highlighted. Deselect-reselect the quest to ensure the stage order is now correct.")
+    }
 
     createAddRemoveStageButtons(questId, stagesContainer)
 }
