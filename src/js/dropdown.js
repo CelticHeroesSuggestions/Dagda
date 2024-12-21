@@ -77,7 +77,7 @@ function createDropdown(id, options, selectedOption, onChange) {
         const optionElement = document.createElement('option')
         optionElement.value = option[0]
         optionElement.innerHTML = option[1]
-        if (option == selectedOption) {
+        if (option == selectedOption || option[0] == selectedOption) {
             optionElement.selected = true
         }
         dropdown.appendChild(optionElement)

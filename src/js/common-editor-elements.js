@@ -1,4 +1,4 @@
-const createInfoNugget = (title, callback=null, isInput = false, text = '', shrink = false,) => {
+const createInfoNugget = (title, callback=null, isInput = false, text = '', shrink = false) => {
     // overall property container
     const infoNugget = document.createElement('div');
     infoNugget.className = 'info-nugget';
@@ -54,11 +54,21 @@ const createInfoNugget = (title, callback=null, isInput = false, text = '', shri
                 callback(textInput.value);  // call the callback function with the new text
             }
         }, false);
+
     }
-
-
     return infoNugget;
 };
+
+function createInfoNuggetWithDropdown(title, dropdownContents, current, callback=null) {
+    nugget = createInfoNugget(title, null, false, '', true)
+    // dropdown
+    const dropdown = createDropdown('info-nugget-type-' + title, dropdownContents, current, (data) => {
+        callback(data.target.value);
+    })
+    dropdown.style.display = "inline-flex";
+    nugget.replaceChild(dropdown, nugget.lastChild)
+    return nugget
+}
 
 const createInfoMainTitle = (title) => {
     const infoSectionTitle = document.createElement('div');

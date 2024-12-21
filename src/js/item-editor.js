@@ -1,5 +1,8 @@
 var itemData = {}
 
+const equipmentSlots = [[-2, "None"], [-1, "Unequipable"], [0, "Weapon"], [1, "Head"], [2, "Torso"], [3, "Legs"], [4, "Feet"], [5, "Offhand"], [6, "Hands"], [7, "Misc"], [8, "Ring R1"], [9, "Ring R2"], [10, "Ring L1"], [11, "Ring L2"], [12, "Bangle R"], [13, "Bangle L"], [14, "Neck"], [15, "Fashion Head"], [16, "Fashion Torso"], [17, "Fashion Legs"], [18, "Fashion Feet"], [19, "Fashion Hands"], [20, "Companion"], [21, "Saddle"], [22, "Mount"], [23, "Rune Weapon"], [24, "Rune Head"], [25, "Rune Torso"], [26, "Rune Legs"], [27, "Rune Feet"], [28, "Rune Offhand"], [29, "Rune Hands"], [30, "Fashion Companion"]]
+const itemSubtypes = [[0, "None"], [1, "Sword"], [2, "Axe"], [3, "Blunt"], [4, "Cloth"], [5, "Leather"], [6, "Chain"], [7, "Plate"], [8, "Staff"], [9, "Dagger"], [10, "Wand"], [11, "Bow"], [12, "Shield"], [13, "Sword Two-Handed"], [14, "Axe Two-Handed"], [15, "Blunt Two-Handed"], [16, "Arrow"], [17, "Offhand Dagger"], [18, "Offhand Sword"], [19, "Spear"], [20, "Totem"], [21, "Broom"], [22, "Sledge"], [23, "Hand to Hand"], [24, "Fashion"], [25, "Jewelry"], [26, "Magic Carpet"], [27, "Broom Novelty"], [28, "Novelty Wand"], [29, "Novelty Lute"], [30, "Novelty Dragonstaff"], [31, "Novelty Flute"], [32, "Novelty 6"], [33, "Novelty 7"], [34, "Novelty 8"], [35, "Novelty 9"], [36, "Novelty 10"], [37, "Novelty Batmount"], [38, "Novelty Angel Wings"], [39, "Novelty Drum"], [40, "Novelty Bagpipes"], [41, "Novelty Eaglemount"], [42, "Test"], [43, "Crow"], [44, "Sparrow"], [45, "Sparrowhawk"], [46, "Spiritcape"], [47, "Horse Mount"], [48, "Banshee Blade"], [49, "Bone Bird"], [50, "Hell Wings"], [51, "Play Dead"], [52, "Banner"], [53, "Boar Mount"], [54, "Fishing Rod"], [55, "Totem Long"], [56, "Offhand Book"], [57, "Spear Two-Handed"], [58, "Pet Food"], [59, "Fishing Item"], [60, "Token"], [61, "Consumable"], [62, "Battle Mount"], [63, "Battle Mount Wand"], [64, "Battle Mount Bow"], [65, "Battle Mount Unarmed"], [66, "Cooking"]]
+
 function initItemEditor() {
     searchButtonTexts["items"] = 'Reload'
 
@@ -119,7 +122,6 @@ function receiveItemSummaryData(data) {
 // load an item into the editor
 function showItem(itemId) {
     // header
-    console.log("!!!", itemId, itemData)
     const infoContainer = document.getElementById("item-info-container")
     infoContainer.replaceChildren()
     item = itemData[itemId]
@@ -132,8 +134,8 @@ function showItem(itemId) {
     const infoRowDetails = document.createElement('div')
     infoRowDetails.className = 'info-row'
     infoRowDetails.appendChild(createInfoNugget('Stackable', (value) => { itemData[itemId]["stackable"] = value; saveitemToDb(itemId) }, true, item["stackable"], true))
-    infoRowDetails.appendChild(createInfoNugget('Equipment Slot', (value) => { itemData[itemId]["equipment_slot"] = value; saveitemToDb(itemId) }, true, item["equipment_slot"], true))
-    infoRowDetails.appendChild(createInfoNugget('Item Subtype', (value) => { itemData[itemId]["item_sub_type"] = value; saveitemToDb(itemId) }, true, item["item_sub_type"], true))
+    infoRowDetails.appendChild(createInfoNuggetWithDropdown('Equipment Slot', equipmentSlots, item["equipment_slot"], (value) => { itemData[itemId]["equipment_slot"] = value; saveitemToDb(itemId) }, false, '', true))
+    infoRowDetails.appendChild(createInfoNuggetWithDropdown('Item Subtype', itemSubtypes, item["item_sub_type"], (value) => { itemData[itemId]["item_sub_type"] = value; saveitemToDb(itemId) }, true, item["item_sub_type"], true))
     infoRowDetails.appendChild(createInfoNugget('No Trade', (value) => { itemData[itemId]["no_trade"] = value; saveitemToDb(itemId) }, true, item["no_trade"], true))
     infoRowDetails.appendChild(createInfoNugget('Buy Price', (value) => { itemData[itemId]["buy_price"] = value; saveitemToDb(itemId) }, true, item["buy_price"], true))
     infoRowDetails.appendChild(createInfoNugget('Sell Price', (value) => { itemData[itemId]["sell_price"] = value; saveitemToDb(itemId) }, true, item["sell_price"], true))
@@ -141,6 +143,7 @@ function showItem(itemId) {
     infoRowDetails.appendChild(createInfoNugget('Bind on Equip', (value) => { itemData[itemId]["bind_on_equip"] = value; saveitemToDb(itemId) }, true, item["bind_on_equip"], true))
     infoRowDetails.appendChild(createInfoNugget('Blocks Slots', (value) => { itemData[itemId]["blocks_slots"] = value; saveitemToDb(itemId) }, true, item["blocks_slots"], true))
     infoRowDetails.appendChild(createInfoNugget('Important Item', (value) => { itemData[itemId]["important_item"] = value; saveitemToDb(itemId) }, true, item["important_item"], true))
+    infoRowDetails.appendChild(createInfoNugget('Requirement List', (value) => { itemData[itemId]["requirement_list"] = value; saveitemToDb(itemId) }, true, item["requirement_list"], true))
     infoRowDetails.appendChild(createInfoNugget('Config ID', (value) => { itemData[itemId]["config_id"] = value; saveitemToDb(itemId) }, true, item["config_id"], true))
     infoContainer.appendChild(infoRowDetails)
 
@@ -156,21 +159,6 @@ function showItem(itemId) {
     infoRowVisuals.appendChild(createInfoNugget('Model Colour', () => { saveitemToDb(itemId) }, true, item["model_colour"], true))
     infoRowVisuals.appendChild(createInfoNugget('Mesh', () => { saveitemToDb(itemId) }, true, item["mesh"], true))
     infoContainer.appendChild(infoRowVisuals)
-
-    // requirements
-    infoContainer.appendChild(createInfoSectionTitle('Requirements'))
-    const infoRowReqs = document.createElement('div')
-    infoRowReqs.className = 'info-row'
-    infoRowReqs.appendChild(createInfoNugget('Level Req', (value) => { itemData[itemId]["level_req"] = value; saveitemToDb(itemId) }, true, item["level_req"], true))
-    infoRowReqs.appendChild(createInfoNugget('Max Level', (value) => { itemData[itemId]["max_level"] = value; saveitemToDb(itemId) }, true, item["max_level"], true))
-    infoRowReqs.appendChild(createInfoNugget('item Level', (value) => { itemData[itemId]["item_level"] = value; saveitemToDb(itemId) }, true, item["item_level"], true))
-    infoRowReqs.appendChild(createInfoNugget('Requires Class', (value) => { itemData[itemId]["requires_class"] = value; saveitemToDb(itemId) }, true, item["requires_class"], true))
-    infoRowReqs.appendChild(createInfoNugget('Prerequisite', (value) => { itemData[itemId]["prerequisite"] = value; saveitemToDb(itemId) }, true, item["prerequisite"], true))
-    infoRowReqs.appendChild(createInfoNugget('Blocked By', (value) => { itemData[itemId]["blocked_by"] = value; saveitemToDb(itemId) }, true, item["blocked_by"], true))
-    infoRowReqs.appendChild(createInfoNugget('Has Ability', (value) => { itemData[itemId]["has_ability"] = value; saveitemToDb(itemId) }, true, item["has_ability"], true))
-    infoRowReqs.appendChild(createInfoNugget('Lacks Ability', (value) => { itemData[itemId]["lacks_ability"] = value; saveitemToDb(itemId) }, true, item["lacks_ability"], true))
-    infoRowReqs.appendChild(createInfoNugget('Requirement List', (value) => { itemData[itemId]["lacks_ability"] = value; saveitemToDb(itemId) }, true, item["lacks_ability"], true))
-    infoContainer.appendChild(infoRowReqs)
 
     // stats
     infoContainer.appendChild(createInfoSectionTitle('Stats'))
