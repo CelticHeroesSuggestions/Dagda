@@ -1,19 +1,20 @@
 var searchButtonTexts = {}
 var dataSummaries = {}
+var dataFetchIntervals = {}
 
 // creates the divs for a searchable side list
 function setUpListSection(category, container, fetchDataButtonCallback, clickListItemCallback) {
     // overall list section
-    const questsListContainer = document.createElement('div')
-    questsListContainer.id = 'quests-list'
-    questsListContainer.className = 'list-overall'
-    container.appendChild(questsListContainer)
+    const overallListContainer = document.createElement('div')
+    overallListContainer.id = category + '-list'
+    overallListContainer.className = 'list-overall'
+    container.appendChild(overallListContainer)
 
     // search box at the top
     const listSearch = document.createElement('div')
     listSearch.id = category + '-list-search'
     listSearch.className = 'list-search'
-    questsListContainer.appendChild(listSearch)
+    overallListContainer.appendChild(listSearch)
 
     // search box resync button
     const listReloadButton = document.createElement('div')
@@ -21,17 +22,17 @@ function setUpListSection(category, container, fetchDataButtonCallback, clickLis
     listReloadButton.className = 'list-reload'
     listReloadButton.innerHTML = "Reload"
     listReloadButton.addEventListener("click", (e) => {
-        if (e.shiftKey && questDataFetchInterval == undefined) {
+        if (e.shiftKey && dataFetchIntervals[category] == undefined) {
             searchButtonTexts[category] = 'Auto'
             fetchDataButtonCallback()
-            questDataFetchInterval = window.setInterval(fetchDataButtonCallback, 10000)
+            dataFetchIntervals[category] = window.setInterval(fetchDataButtonCallback, 10000)
             listReloadButton.style.backgroundColor = "red"
         }
         else {
             // clear the automatic reload
-            if (questDataFetchInterval != undefined) {
-                window.clearInterval(questDataFetchInterval)
-                questDataFetchInterval = undefined
+            if (dataFetchIntervals[category] != undefined) {
+                window.clearInterval(dataFetchIntervals[category])
+                dataFetchIntervals[category] = undefined
                 listReloadButton.style.backgroundColor = ""
                 searchButtonTexts[category] = 'Reload'
             }
@@ -44,10 +45,10 @@ function setUpListSection(category, container, fetchDataButtonCallback, clickLis
     listSearchInput = document.createElement('input')
     listSearchInput.id = category + '-list-search-input'
     listSearchInput.className = 'list-search'
-    listSearchInput.placeholder = 'Search for a quest...'
+    listSearchInput.placeholder = 'Search for a ' + category + '...'
     listSearchInput.oninput = function() {
         // filter the list
-        generateList(category + "-list-container", dataSummaries[category], clickListItemCallback, listSearchInput.value)
+        generateList(category, dataSummaries[category], clickListItemCallback, listSearchInput.value)
     }
     listSearch.appendChild(listSearchInput)
 
@@ -55,7 +56,7 @@ function setUpListSection(category, container, fetchDataButtonCallback, clickLis
     const listContainer = document.createElement('div')
     listContainer.id = category + '-list-container'
     listContainer.className = 'list-container'
-    questsListContainer.appendChild(listContainer)
+    overallListContainer.appendChild(listContainer)
 
     // create a default message in the search results container
     const searchPlaceholder = document.createElement('div')
@@ -80,13 +81,13 @@ function highlightListRow(category, index) {
 }
 
 // creates a list in a standardized format 
-function generateList(eid, data, clickHandler, nameFilter="") {
-    listContainer = document.getElementById(eid)
+function generateList(category, data, clickHandler, nameFilter="") {
+    listContainer = document.getElementById(category + '-list-container')
     listContainer.replaceChildren()
     let index = 0
     data.forEach((item) => {
         // ignore those outside the filter
-        if (!(item.name.toLowerCase() + item.id).includes(nameFilter.toLowerCase())) {
+        if (typeof item.name == "string" && !(item.name.toLowerCase() + item.id).includes(nameFilter.toLowerCase())) {
             return;
         }
         let row = document.createElement("div")
@@ -101,7 +102,7 @@ function generateList(eid, data, clickHandler, nameFilter="") {
         // set the onclick for the row
         row.addEventListener("click", function() {
             // highlight the row
-            highlightListRow("quests", row.value)
+            highlightListRow(category, row.value)
             // click handler
             clickHandler(item.id)
         })

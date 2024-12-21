@@ -182,7 +182,7 @@ function addStage(stage, container, secondToLast=false) {
 // load a quest into the editor
 function showQuest(questId) {
     // header
-    const infoContainer = document.getElementById("info-container")
+    const infoContainer = document.getElementById("quest-info-container")
     infoContainer.replaceChildren()
     quest = questData[questId]
     infoContainer.appendChild(createInfoMainTitle(quest["quest_name"] + " (" + quest["quest_id"] + ")"))
@@ -283,7 +283,6 @@ function receiveQuestTemplateData(data) {
 
     // now that we have the quests, let's get the stages
     fetchQuestStageData()
-
 }
 
 // get the quest stage data from the database
@@ -310,7 +309,7 @@ function receiveQuestStageTemplateData(data) {
     })
 
     // update the search results
-    numResults = generateList("quests-list-container", dataSummaries["quests"], showQuest, document.getElementById("quests-list-search-input").value)
+    numResults = generateList("quests", dataSummaries["quests"], showQuest, document.getElementById("quests-list-search-input").value)
 
     // select the first item in the list
     if (numResults > 0) {
