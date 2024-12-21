@@ -194,6 +194,7 @@ function showQuest(questId) {
     const infoRowReqs = document.createElement('div')
     infoRowReqs.className = 'info-row'
     infoRowReqs.appendChild(createInfoNugget('Level Req', (value) => { questData[questId]["level_req"] = value; saveQuestToDb(questId) }, true, quest["level_req"], true))
+    infoRowReqs.appendChild(createInfoNugget('Max Level', (value) => { questData[questId]["max_level"] = value; saveQuestToDb(questId) }, true, quest["max_level"], true))
     infoRowReqs.appendChild(createInfoNugget('Quest Level', (value) => { questData[questId]["quest_level"] = value; saveQuestToDb(questId) }, true, quest["quest_level"], true))
     infoRowReqs.appendChild(createInfoNugget('Requires Class', (value) => { questData[questId]["requires_class"] = value; saveQuestToDb(questId) }, true, quest["requires_class"], true))
     infoRowReqs.appendChild(createInfoNugget('Prerequisite', (value) => { questData[questId]["prerequisite"] = value; saveQuestToDb(questId) }, true, quest["prerequisite"], true))
@@ -249,31 +250,32 @@ function receiveQuestTemplateData(data) {
     dataSummaries["quests"] = []
     data["message"].forEach(row => {
         let questId = row[0]
-        let questName = row[15]
+        let questName = row[16]
         questData[questId] = {
             "quest_id": questId,
             "level_required": row[1],
-            "xp_reward": row[2],
-            "coins_reward": row[3],
-            "item_reward": row[4],
-            "item_count": row[5],
-            "prerequesit": row[6],
-            "zone": row[7],
-            "quest_level": row[8],
-            "repeatable": row[9],
-            "requires class": row[10], 
-            "has_ability": row[11],
-            "lacks_ability": row[12],
-            "uses_loot_table": row[13],
-            "blocked_by": row[14],
+            "max_level": row[2],
+            "xp_reward": row[3],
+            "coins_reward": row[4],
+            "item_reward": row[5],
+            "item_count": row[6],
+            "prerequesit": row[7],
+            "zone": row[8],
+            "quest_level": row[9],
+            "repeatable": row[10],
+            "requires class": row[11], 
+            "has_ability": row[12],
+            "lacks_ability": row[13],
+            "uses_loot_table": row[14],
+            "blocked_by": row[15],
             "quest_name": questName,
-            "bounty_weight": row[16],
-            "quest_type": row[17],
-            "faction_id": row[18],
-            "faction_level": row[19],
-            "faction_id_reward": row[20],
-            "faction_point_reward": row[21],
-            "description": row[22],
+            "bounty_weight": row[17],
+            "quest_type": row[18],
+            "faction_id": row[19],
+            "faction_level": row[20],
+            "faction_id_reward": row[21],
+            "faction_point_reward": row[22],
+            "description": row[23],
             "stages": []
         }
         dataSummaries["quests"].push({"id": questId, "name": questName})
